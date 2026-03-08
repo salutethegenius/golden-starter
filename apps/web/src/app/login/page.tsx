@@ -49,7 +49,7 @@ export default function LoginPage() {
         <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
           Sign in
         </h1>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleSignIn}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
               Email
