@@ -483,7 +483,7 @@ function Hero() {
             className="hero-stats"
             style={{ display: "flex", gap: "28px", marginTop: "44px", paddingTop: "28px", borderTop: "1px solid var(--border)" }}
           >
-            {[["15", "+", "Platforms built"], ["3", "", "Active ecosystems"], ["100", "%", "Bahamian-built"]].map(([n, suf, label]) => (
+            {[["15", "+", "Platforms built"], ["6", "", "Active ecosystems"], ["100", "%", "Bahamian-built"]].map(([n, suf, label]) => (
               <div key={label}>
                 <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--navy)", letterSpacing: "-0.5px" }}>
                   <Counter to={parseInt(n)} suffix={suf} />
@@ -654,14 +654,83 @@ function WhatWeBuild() {
 function Ecosystem() {
   const [ref, inView] = useScrollReveal(0.1);
   const platforms = [
-    { name: "KemisPay",             desc: "Payment & financial infrastructure",   color: "#0066FF", initial: "KP" },
-    { name: "VerityOS",             desc: "AI platform & automation layer",        color: "#6B21A8", initial: "VO" },
-    { name: "LawBey",               desc: "AI-powered legal assistant",            color: "#0D9488", initial: "LB" },
-    { name: "Anchor",               desc: "Sovereign digital document vault",      color: "#1D4ED8", initial: "AN" },
-    { name: "KemisEmail",           desc: "Email marketing platform",              color: "#DC2626", initial: "KE" },
-    { name: "Voice of The Bahamas", desc: "Civic intelligence platform",           color: "#059669", initial: "VB" },
-    { name: "Freeport Squares",     desc: "Community & business directory",        color: "#D97706", initial: "FS" },
-    { name: "Grand Bahama Rewards", desc: "Digital loyalty ecosystem",             color: "#7C3AED", initial: "GR" },
+    {
+      name: "KemisPay",
+      desc: "Payments and payouts for Bahamian businesses.",
+      url: "kemispay.com",
+      color: "#0066FF",
+      initial: "KP",
+    },
+    {
+      name: "Anchor",
+      desc: "Sovereign document and records vault.",
+      url: "anchor.verityos.net",
+      color: "#1D4ED8",
+      initial: "AN",
+    },
+    {
+      name: "Urban Nassau Rides",
+      desc: "Ride booking and dispatch for Nassau.",
+      url: "urbannassaurides.com",
+      color: "#EA580C",
+      initial: "UN",
+    },
+    {
+      name: "LawBey",
+      desc: "AI-powered legal research and drafting.",
+      url: "lawbey.com",
+      color: "#0D9488",
+      initial: "LB",
+    },
+    {
+      name: "Bahamas Open Data",
+      desc: "Public data and transparency infrastructure.",
+      url: "bahamasopendata.com",
+      color: "#059669",
+      initial: "BD",
+    },
+    {
+      name: "VerityOS Sovereign Audit Kernel",
+      desc: "Audit-grade event tracking for regulated systems.",
+      url: "audit.verityos.net",
+      color: "#6B21A8",
+      initial: "AK",
+    },
+    {
+      name: "Freeport Squares",
+      desc: "Local business and community discovery.",
+      url: "freeportsquares.com",
+      color: "#D97706",
+      initial: "FS",
+    },
+    {
+      name: "GB Rewards",
+      desc: "Island-wide loyalty and rewards network.",
+      url: "gbrewards.com",
+      color: "#7C3AED",
+      initial: "GB",
+    },
+    {
+      name: "Grand Bridge",
+      desc: "Cross-border trade and payments gateway.",
+      url: "mygrandbridge.com",
+      color: "#0EA5E9",
+      initial: "GB",
+    },
+    {
+      name: "KRM Desk",
+      desc: "Relationship management for growing teams.",
+      url: "krmdesk.com",
+      color: "#F97316",
+      initial: "KD",
+    },
+    {
+      name: "Kemis Academy",
+      desc: "Training for modern digital skills.",
+      url: "kemisacademy.com",
+      color: "#10B981",
+      initial: "KA",
+    },
   ];
 
   return (
@@ -691,11 +760,14 @@ function Ecosystem() {
 
           <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "14px" }}>
             {platforms.map((p, i) => (
-              <motion.div
+              <motion.a
                 key={p.name}
+                href={p.url ? `https://${p.url}` : undefined}
+                target={p.url ? "_blank" : undefined}
+                rel={p.url ? "noreferrer" : undefined}
                 variants={{ hidden: { opacity: 0, y: 40, scale: 0.92 }, visible: { opacity: 1, y: 0, scale: 1, transition: { ...SPRING.gentle, delay: i * 0.06 } } }}
                 whileHover={{ y: -4, background: "rgba(255,255,255,0.1)", borderColor: "rgba(255,255,255,0.22)", transition: SPRING.card }}
-                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", padding: "20px", display: "flex", alignItems: "flex-start", gap: "14px", cursor: "default" }}
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "14px", padding: "20px", display: "flex", alignItems: "flex-start", gap: "14px", cursor: p.url ? "pointer" : "default", textDecoration: "none" }}
               >
                 <motion.div
                   whileHover={{ scale: 1.1, rotate: -4 }}
@@ -707,9 +779,70 @@ function Ecosystem() {
                 <div>
                   <div style={{ fontSize: "14.5px", fontWeight: 700, color: "white", marginBottom: "4px" }}>{p.name}</div>
                   <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>{p.desc}</div>
+                  {p.url && (
+                    <div
+                      style={{
+                        fontSize: "11px",
+                        color: "rgba(148,163,184,0.85)",
+                        marginTop: "4px",
+                        fontFamily: "var(--mono)",
+                      }}
+                    >
+                      {p.url}
+                    </div>
+                  )}
                 </div>
-              </motion.div>
+              </motion.a>
             ))}
+
+            <motion.button
+              type="button"
+              onClick={() => document.getElementById("book-session")?.scrollIntoView({ behavior: "smooth" })}
+              whileHover={{
+                y: -4,
+                boxShadow: "0 24px 60px rgba(59,130,246,0.5)",
+                background: "linear-gradient(135deg,#38bdf8,#6366f1)",
+              }}
+              transition={SPRING.card}
+              style={{
+                borderRadius: "14px",
+                padding: "20px",
+                border: "1px dashed rgba(191,219,254,0.8)",
+                background: "linear-gradient(135deg,rgba(59,130,246,0.25),rgba(37,99,235,0.05))",
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "14px",
+                cursor: "pointer",
+                textAlign: "left",
+              }}
+            >
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "999px",
+                  background: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "20px",
+                  fontWeight: 800,
+                  color: "#2563EB",
+                  flexShrink: 0,
+                  boxShadow: "0 10px 30px rgba(15,23,42,0.4)",
+                }}
+              >
+                +
+              </div>
+              <div>
+                <div style={{ fontSize: "14.5px", fontWeight: 800, color: "white", marginBottom: "4px" }}>
+                  Your project is next
+                </div>
+                <div style={{ fontSize: "12.5px", color: "rgba(219,234,254,0.9)", lineHeight: 1.6 }}>
+                  Click to tell us about your project and we’ll show you where it fits in this ecosystem.
+                </div>
+              </div>
+            </motion.button>
           </div>
 
           <motion.p
@@ -807,9 +940,30 @@ function HowWeWork() {
 function CaseStudies() {
   const [ref, inView] = useScrollReveal();
   const cases = [
-    { industry: "Hospitality",          title: "Digital Rewards & Loyalty Ecosystem",  result: "Replaced paper loyalty cards with a fully digital rewards platform tied to point-of-sale systems across multiple locations.", metric: "3 locations connected", color: "#D97706" },
-    { industry: "Professional Services",title: "Business Automation Platform",          result: "Eliminated manual HR, payroll, and scheduling workflows for a Nassau-based organization with 100+ employees.", metric: "100+ employees automated", color: "#0066FF" },
-    { industry: "Financial Services",   title: "Payment & Invoicing System",            result: "Custom payment infrastructure replacing manual invoicing and vendor payment processes, reducing processing time significantly.", metric: "60% less admin time", color: "#059669" },
+    {
+      industry: "Hospitality",
+      title: "Digital Rewards & Loyalty Ecosystem",
+      result:
+        "Replaced paper loyalty cards with a fully digital rewards platform tied to point-of-sale systems across multiple locations.",
+      metric: "1 island connected",
+      color: "#D97706",
+    },
+    {
+      industry: "Professional Services",
+      title: "Business Automation Platform",
+      result:
+        "Eliminated manual HR, payroll, and scheduling workflows for a Nassau-based organization with 20+ employees.",
+      metric: "20+ employees automated",
+      color: "#0066FF",
+    },
+    {
+      industry: "Financial Services",
+      title: "Payment & Invoicing System",
+      result:
+        "Custom payment infrastructure replacing manual invoicing and vendor payment processes, reducing processing time significantly.",
+      metric: "60% less admin time",
+      color: "#059669",
+    },
   ];
 
   return (
@@ -1453,9 +1607,40 @@ function SummaryItem({ label, items }) {
 /* ─── Footer ─────────────────────────────────────────────────────────────────── */
 function Footer() {
   const cols = [
-    { title: "Services",  links: ["Business Automation", "Payments & Fintech", "Customer Portals", "System Integration", "AI Tools"] },
-    { title: "Ecosystem", links: ["KemisPay", "VerityOS", "LawBey", "KemisEmail", "Anchor"] },
-    { title: "Company",   links: ["About", "Careers", "Contact", "Privacy Policy"] },
+    {
+      title: "Services",
+      links: [
+        { label: "Business Automation", href: "#services" },
+        { label: "Payments & Fintech", href: "#services" },
+        { label: "Customer Portals", href: "#services" },
+        { label: "System Integration", href: "#services" },
+        { label: "AI Tools", href: "#services" },
+      ],
+    },
+    {
+      title: "Ecosystem",
+      links: [
+        { label: "KemisPay", href: "https://kemispay.com", external: true },
+        { label: "Urban Nassau Rides", href: "https://urbannassaurides.com", external: true },
+        { label: "LawBey", href: "https://lawbey.com", external: true },
+        { label: "KRM Desk", href: "https://krmdesk.com", external: true },
+        { label: "GB Rewards", href: "https://gbrewards.com", external: true },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About KemisDigital", href: "#how-we-work" },
+        {
+          label: "Contact",
+          href: "#book-session",
+        },
+        {
+          label: "Privacy Policy",
+          href: "/privacy",
+        },
+      ],
+    },
   ];
   return (
     <footer className="section-pad" style={{ background: "var(--navy)", padding: "64px 32px 32px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
@@ -1470,22 +1655,59 @@ function Footer() {
                 <text x="48" y="28" fontFamily="'Plus Jakarta Sans', sans-serif" fontSize="21" fontWeight="800" fill="white" letterSpacing="-0.6">Kemis<tspan fill="#0066FF">Digital</tspan></text>
               </svg>
             </div>
-            <p style={{ fontSize: "13.5px", color: "rgba(255,255,255,0.35)", lineHeight: 1.7, maxWidth: "220px" }}>
-              Building the platforms that power modern Bahamian businesses.
+            <p style={{ fontSize: "13.5px", color: "rgba(255,255,255,0.35)", lineHeight: 1.7, maxWidth: "260px" }}>
+              KemisDigital designs and builds platforms for Bahamian businesses — from payments and loyalty to internal operations.
             </p>
-            <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.2)", marginTop: "16px" }}>Nassau, The Bahamas</p>
+            <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.25)", marginTop: "12px" }}>
+              Nassau, The Bahamas ·{" "}
+              <a
+                href="mailto:frontdesk@kemisdigital.com"
+                style={{ color: "rgba(191,219,254,0.9)", textDecoration: "none" }}
+              >
+                frontdesk@kemisdigital.com
+              </a>
+            </p>
           </div>
           {cols.map((col) => (
             <div key={col.title}>
               <div style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: "1.5px", textTransform: "uppercase", fontFamily: "var(--mono)", marginBottom: "16px" }}>{col.title}</div>
-              {col.links.map(l => (
-                <motion.div
-                  key={l}
-                  whileHover={{ x: 4, color: "rgba(255,255,255,0.85)" }}
-                  transition={SPRING.snappy}
-                  style={{ fontSize: "13.5px", color: "rgba(255,255,255,0.45)", marginBottom: "10px", cursor: "pointer" }}
-                >{l}</motion.div>
-              ))}
+              {col.links.map((link) => {
+                const isAnchor = link.href && link.href.startsWith("#");
+                const handleClick = (e) => {
+                  if (!isAnchor) return;
+                  e.preventDefault();
+                  document.querySelector(link.href)?.scrollIntoView({ behavior: "smooth" });
+                };
+
+                if (link.external) {
+                  return (
+                    <motion.a
+                      key={link.label}
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      whileHover={{ x: 4, color: "rgba(255,255,255,0.85)" }}
+                      transition={SPRING.snappy}
+                      style={{ fontSize: "13.5px", color: "rgba(255,255,255,0.45)", marginBottom: "10px", display: "block", textDecoration: "none" }}
+                    >
+                      {link.label}
+                    </motion.a>
+                  );
+                }
+
+                return (
+                  <motion.a
+                    key={link.label}
+                    href={link.href}
+                    onClick={handleClick}
+                    whileHover={{ x: 4, color: "rgba(255,255,255,0.85)" }}
+                    transition={SPRING.snappy}
+                    style={{ fontSize: "13.5px", color: "rgba(255,255,255,0.45)", marginBottom: "10px", display: "block", textDecoration: "none", cursor: "pointer" }}
+                  >
+                    {link.label}
+                  </motion.a>
+                );
+              })}
             </div>
           ))}
         </div>
