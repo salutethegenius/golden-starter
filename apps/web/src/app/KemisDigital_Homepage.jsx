@@ -35,6 +35,54 @@ const GlobalStyles = () => (
     .dot-grid { background-image:radial-gradient(circle,#c8d3ea 1px,transparent 1px);background-size:28px 28px; }
     ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:#f0f2f8} ::-webkit-scrollbar-thumb{background:#b0bcd8;border-radius:3px}
     .section-label { font-size:11.5px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;font-family:var(--mono); }
+
+    /* Hamburger button — hidden on desktop */
+    .hamburger { display:none;background:none;border:none;cursor:pointer;padding:6px;-webkit-tap-highlight-color:transparent; }
+    .hamburger span { display:block;width:22px;height:2px;background:var(--navy);border-radius:2px;transition:transform .25s,opacity .25s; }
+    .hamburger span+span { margin-top:5px; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer overlay */
+    .mobile-drawer { display:none;position:fixed;top:68px;left:0;right:0;bottom:0;background:rgba(255,255,255,.98);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:28px;backdrop-filter:blur(16px); }
+    .mobile-drawer.open { display:flex; }
+    .mobile-drawer .nav-link { font-size:18px; }
+
+    /* ─── Tablet: ≤ 960px ─── */
+    @media (max-width:960px) {
+      .nav-links { display:none !important; }
+      .btn-nav-desktop { display:none !important; }
+      .hamburger { display:flex;flex-direction:column;align-items:center;justify-content:center; }
+      .hero-flex { flex-direction:column !important;gap:40px !important;text-align:center; }
+      .hero-left { width:100% !important;max-width:100% !important; }
+      .hero-left p { margin-left:auto;margin-right:auto; }
+      .hero-btns { justify-content:center; }
+      .hero-stats { justify-content:center; }
+      .hero-mockup { width:100% !important;max-width:560px !important;margin:0 auto; }
+      .grid-4 { grid-template-columns:repeat(2,1fr) !important; }
+      .grid-3 { grid-template-columns:repeat(2,1fr) !important; }
+      .grid-steps { grid-template-columns:repeat(2,1fr) !important; }
+      .grid-form-layout { grid-template-columns:1fr !important; }
+      .grid-footer { grid-template-columns:1fr 1fr !important;gap:32px !important; }
+      .grid-checkboxes { grid-template-columns:1fr 1fr !important; }
+      .grid-contact { grid-template-columns:1fr 1fr !important; }
+    }
+
+    /* ─── Mobile: ≤ 640px ─── */
+    @media (max-width:640px) {
+      .nav-inner { padding:0 16px;height:60px; }
+      .hero-section { padding-top:110px !important;padding-bottom:60px !important; }
+      .hero-flex { padding:0 16px !important; }
+      .section-pad { padding-left:16px !important;padding-right:16px !important; }
+      .grid-4 { grid-template-columns:1fr !important; }
+      .grid-3 { grid-template-columns:1fr !important; }
+      .grid-steps { grid-template-columns:1fr !important; }
+      .grid-footer { grid-template-columns:1fr !important;gap:24px !important; }
+      .grid-checkboxes { grid-template-columns:1fr !important; }
+      .grid-contact { grid-template-columns:1fr !important; }
+      .mobile-drawer { top:60px; }
+    }
   `}</style>
 );
 
@@ -114,53 +162,98 @@ function Counter({ to, suffix = "", prefix = "" }) {
 /* ─── Nav ────────────────────────────────────────────────────────────────────── */
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  const navLinks = ["Services", "Ecosystem", "How We Work", "Case Studies"];
+
+  const handleLinkClick = (href) => {
+    setMenuOpen(false);
+    setTimeout(() => {
+      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
-    <nav className={`nav${scrolled ? " scrolled" : ""}`}>
-      <div className="nav-inner">
-        {/* Logo: Concept 01 — Platform Stack */}
-        <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ ...SPRING.snappy, delay: 0.1 }}
-        >
-          <svg width="190" height="36" viewBox="0 0 220 40" fill="none">
-            <rect x="0"  y="0"  width="36" height="9"  rx="2.5" fill="#0A1628"/>
-            <rect x="0"  y="14" width="28" height="9"  rx="2.5" fill="#0066FF"/>
-            <rect x="0"  y="28" width="18" height="9"  rx="2.5" fill="#0A1628" opacity="0.35"/>
-            <text x="48" y="28" fontFamily="'Plus Jakarta Sans', sans-serif" fontSize="21" fontWeight="800" fill="#0A1628" letterSpacing="-0.6">Kemis<tspan fill="#0066FF">Digital</tspan></text>
-          </svg>
-        </motion.div>
+    <>
+      <nav className={`nav${scrolled ? " scrolled" : ""}${menuOpen ? " scrolled" : ""}`}>
+        <div className="nav-inner">
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ ...SPRING.snappy, delay: 0.1 }}
+          >
+            <svg width="190" height="36" viewBox="0 0 220 40" fill="none">
+              <rect x="0"  y="0"  width="36" height="9"  rx="2.5" fill="#0A1628"/>
+              <rect x="0"  y="14" width="28" height="9"  rx="2.5" fill="#0066FF"/>
+              <rect x="0"  y="28" width="18" height="9"  rx="2.5" fill="#0A1628" opacity="0.35"/>
+              <text x="48" y="28" fontFamily="'Plus Jakarta Sans', sans-serif" fontSize="21" fontWeight="800" fill="#0A1628" letterSpacing="-0.6">Kemis<tspan fill="#0066FF">Digital</tspan></text>
+            </svg>
+          </motion.div>
 
-        <motion.div
-          className="nav-links"
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...SPRING.snappy, delay: 0.2 }}
-        >
-          {["Services", "Ecosystem", "How We Work", "Case Studies"].map(l => (
-            <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`} className="nav-link">{l}</a>
-          ))}
-        </motion.div>
+          <motion.div
+            className="nav-links"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...SPRING.snappy, delay: 0.2 }}
+          >
+            {navLinks.map(l => (
+              <a key={l} href={`#${l.toLowerCase().replace(/ /g, "-")}`} className="nav-link">{l}</a>
+            ))}
+          </motion.div>
 
-        <motion.button
+          <motion.button
+            className="btn-nav btn-nav-desktop"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ ...SPRING.bouncy, delay: 0.3 }}
+            whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(0,102,255,0.35)" }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => document.getElementById("book-session")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Book a Call
+          </motion.button>
+
+          <button
+            className={`hamburger${menuOpen ? " open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
+        </div>
+      </nav>
+
+      <div className={`mobile-drawer${menuOpen ? " open" : ""}`}>
+        {navLinks.map(l => (
+          <a
+            key={l}
+            href={`#${l.toLowerCase().replace(/ /g, "-")}`}
+            className="nav-link"
+            onClick={(e) => { e.preventDefault(); handleLinkClick(`#${l.toLowerCase().replace(/ /g, "-")}`); }}
+          >
+            {l}
+          </a>
+        ))}
+        <button
           className="btn-nav"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ ...SPRING.bouncy, delay: 0.3 }}
-          whileHover={{ scale: 1.05, boxShadow: "0 8px 24px rgba(0,102,255,0.35)" }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => document.getElementById("book-session")?.scrollIntoView({ behavior: "smooth" })}
+          style={{ marginTop: "8px", padding: "14px 32px", fontSize: "16px" }}
+          onClick={() => { setMenuOpen(false); setTimeout(() => document.getElementById("book-session")?.scrollIntoView({ behavior: "smooth" }), 100); }}
         >
           Book a Call
-        </motion.button>
+        </button>
       </div>
-    </nav>
+    </>
   );
 }
 
@@ -296,14 +389,14 @@ function Hero() {
   const words = ["The software", "platform built for", "Bahamian business."];
 
   return (
-    <section style={{ paddingTop: "148px", paddingBottom: "100px", position: "relative", overflow: "hidden" }}>
+    <section className="hero-section" style={{ paddingTop: "148px", paddingBottom: "100px", position: "relative", overflow: "hidden" }}>
       <div className="dot-grid" style={{ position: "absolute", inset: 0, opacity: 0.45, zIndex: 0 }} aria-hidden="true" />
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(255,255,255,0) 40%,rgba(255,255,255,1) 100%)", zIndex: 1 }} />
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 32px", position: "relative", zIndex: 2, display: "flex", gap: "64px", alignItems: "center" }}>
+      <div className="hero-flex" style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 32px", position: "relative", zIndex: 2, display: "flex", gap: "64px", alignItems: "center" }}>
 
         {/* Left */}
-        <div style={{ flex: "0 0 auto", width: "clamp(300px,46%,520px)" }}>
+        <div className="hero-left" style={{ flex: "0 0 auto", width: "clamp(300px,46%,520px)" }}>
 
           {/* Badge */}
           <motion.div
@@ -359,6 +452,7 @@ function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...SPRING.gentle, delay: 0.68 }}
+            className="hero-btns"
             style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}
           >
             <motion.button
@@ -386,6 +480,7 @@ function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.85, duration: 0.6 }}
+            className="hero-stats"
             style={{ display: "flex", gap: "28px", marginTop: "44px", paddingTop: "28px", borderTop: "1px solid var(--border)" }}
           >
             {[["15", "+", "Platforms built"], ["3", "", "Active ecosystems"], ["100", "%", "Bahamian-built"]].map(([n, suf, label]) => (
@@ -401,6 +496,7 @@ function Hero() {
 
         {/* Right: Mockup — springs in from right with slight rotation */}
         <motion.div
+          className="hero-mockup"
           initial={{ opacity: 0, x: 60, rotateY: 8 }}
           animate={{ opacity: 1, x: 0, rotateY: 0 }}
           transition={{ ...SPRING.slow, delay: 0.35 }}
@@ -428,7 +524,7 @@ function Problem() {
     { icon: "⏱️", title: "Wasted hours",          desc: "Your best people are doing work that software should handle." },
   ];
   return (
-    <section style={{ background: "var(--muted-bg)", padding: "100px 32px" }}>
+    <section className="section-pad" style={{ background: "var(--muted-bg)", padding: "100px 32px" }}>
       <motion.div
         ref={ref}
         variants={stagger(0.1)}
@@ -445,6 +541,7 @@ function Problem() {
 
         <motion.div
           variants={stagger(0.1)}
+          className="grid-4"
           style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "20px", marginBottom: "48px" }}
         >
           {problems.map((p) => (
@@ -489,7 +586,7 @@ function WhatWeBuild() {
     { icon: "🏛️", title: "Enterprise Platforms", desc: "Large-scale internal systems, government tools, and multi-tenant SaaS applications.", tag: null },
   ];
   return (
-    <section id="services" style={{ padding: "100px 32px" }}>
+    <section id="services" className="section-pad" style={{ padding: "100px 32px" }}>
       <div ref={ref} style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <motion.div
           variants={stagger(0.08)}
@@ -512,7 +609,7 @@ function WhatWeBuild() {
             </motion.button>
           </motion.div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "18px" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "18px" }}>
             {services.map((s, i) => (
               <motion.div
                 key={s.title}
@@ -568,7 +665,7 @@ function Ecosystem() {
   ];
 
   return (
-    <section id="ecosystem" style={{ background: "var(--navy)", padding: "100px 32px", position: "relative", overflow: "hidden" }}>
+    <section id="ecosystem" className="section-pad" style={{ background: "var(--navy)", padding: "100px 32px", position: "relative", overflow: "hidden" }}>
       <motion.div
         animate={{ scale: [1, 1.15, 1], opacity: [0.08, 0.14, 0.08] }}
         transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
@@ -592,7 +689,7 @@ function Ecosystem() {
             </p>
           </motion.div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "14px" }}>
+          <div className="grid-4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "14px" }}>
             {platforms.map((p, i) => (
               <motion.div
                 key={p.name}
@@ -645,7 +742,7 @@ function HowWeWork() {
   ];
 
   return (
-    <section id="how-we-work" style={{ background: "var(--muted-bg)", padding: "100px 32px" }}>
+    <section id="how-we-work" className="section-pad" style={{ background: "var(--muted-bg)", padding: "100px 32px" }}>
       <div ref={ref} style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 28 }}
@@ -662,7 +759,7 @@ function HowWeWork() {
           </p>
         </motion.div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0", position: "relative" }}>
+        <div className="grid-steps" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "0", position: "relative" }}>
           {/* Animated connecting line */}
           <div style={{ position: "absolute", top: "32px", left: "12.5%", right: "12.5%", height: "2px", zIndex: 0, overflow: "hidden", borderRadius: "2px", background: "var(--border)" }}>
             <motion.div
@@ -716,7 +813,7 @@ function CaseStudies() {
   ];
 
   return (
-    <section id="case-studies" style={{ padding: "100px 32px" }}>
+    <section id="case-studies" className="section-pad" style={{ padding: "100px 32px" }}>
       <div ref={ref} style={{ maxWidth: "1200px", margin: "0 auto" }}>
         <motion.div
           variants={stagger(0.12)}
@@ -731,7 +828,7 @@ function CaseStudies() {
             <p style={{ fontSize: "14px", color: "var(--text-mute)", maxWidth: "260px", lineHeight: 1.5 }}>Full case studies available during a strategy session.</p>
           </motion.div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px" }}>
+          <div className="grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "20px" }}>
             {cases.map((c, i) => (
               <motion.div
                 key={c.title}
@@ -775,7 +872,7 @@ function CaseStudies() {
 function CTASection() {
   const [ref, inView] = useScrollReveal(0.3);
   return (
-    <section style={{ background: "var(--navy-mid)", padding: "100px 32px", position: "relative", overflow: "hidden" }}>
+    <section className="section-pad" style={{ background: "var(--navy-mid)", padding: "100px 32px", position: "relative", overflow: "hidden" }}>
       <motion.div
         animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
         transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
@@ -930,7 +1027,7 @@ const sectionTitleStyle = {
 
 function CheckboxGroup({ name, options, selected, onChange }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" }}>
+    <div className="grid-checkboxes" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" }}>
       {options.map((option) => (
         <label
           key={option}
@@ -1044,6 +1141,7 @@ function BookingForm() {
     <section
       id="book-session"
       ref={ref}
+      className="section-pad"
       style={{ background: "var(--muted-bg)", padding: "100px 32px", position: "relative" }}
     >
       <div style={{ maxWidth: "960px", margin: "0 auto" }}>
@@ -1094,6 +1192,7 @@ function BookingForm() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={SPRING.gentle}
+                className="grid-form-layout"
                 style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "32px", alignItems: "start" }}
               >
                 {/* Main form */}
@@ -1118,7 +1217,7 @@ function BookingForm() {
                   {/* Contact Info */}
                   <div>
                     <div style={sectionTitleStyle}>Contact Information</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                    <div className="grid-contact" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                       <div>
                         <label style={labelStyle}>Full Name *</label>
                         <input name="full_name" required placeholder="John Smith" style={inputStyle} onFocus={(e) => { e.target.style.borderColor = "var(--accent)"; e.target.style.boxShadow = "0 0 0 3px rgba(0,102,255,0.1)"; }} onBlur={(e) => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
@@ -1359,9 +1458,9 @@ function Footer() {
     { title: "Company",   links: ["About", "Careers", "Contact", "Privacy Policy"] },
   ];
   return (
-    <footer style={{ background: "var(--navy)", padding: "64px 32px 32px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+    <footer className="section-pad" style={{ background: "var(--navy)", padding: "64px 32px 32px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr repeat(3,1fr)", gap: "48px", marginBottom: "56px" }}>
+        <div className="grid-footer" style={{ display: "grid", gridTemplateColumns: "2fr repeat(3,1fr)", gap: "48px", marginBottom: "56px" }}>
           <div>
             <div style={{ marginBottom: "14px" }}>
               <svg width="170" height="32" viewBox="0 0 220 40" fill="none">
