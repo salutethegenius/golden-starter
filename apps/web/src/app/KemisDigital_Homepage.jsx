@@ -1712,7 +1712,7 @@ function Footer() {
           ))}
         </div>
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "24px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-          <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.2)" }}>© 2025 The Kemis Group of Companies. All rights reserved.</p>
+          <p style={{ fontSize: "12.5px", color: "rgba(255,255,255,0.2)" }}>© 2026 The Kemis Group of Companies. All rights reserved.</p>
           <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.15)", fontFamily: "var(--mono)" }}>kemisdigital.com</p>
         </div>
       </div>
