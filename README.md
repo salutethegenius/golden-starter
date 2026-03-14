@@ -1,93 +1,132 @@
-# Golden Starter (Verity Application Framework)
+# A.M.T Imports - Courier Business System
 
-Clone this template to start new projects with zero setup. See [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md) for philosophy and stack defaults.
+An online system for managing courier operations: customer management, order tracking, invoice generation, online payments, and email notifications.
+
+## Features
+
+- **Public Landing Page** - Company info, services, pricing, and contact details
+- **Admin Dashboard** - Manage customers, orders, invoices, and payments
+- **Customer Portal** - View orders, invoices, pay online, and download receipts
+- **Stripe Integration** - Secure online payments via Stripe Checkout
+- **Email Notifications** - Automated emails for invoices, payments, and order updates
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 + TypeScript + Tailwind CSS
+- **Database & Auth**: Supabase (Postgres + Auth + Row Level Security)
+- **Payments**: Stripe Checkout
+- **Email**: Resend
+- **Backend**: FastAPI (optional, for extended features)
+- **Deployment**: Docker
 
 ## Prerequisites
 
 - Node 20+
-- Python 3.11+
-- Optional: Docker (for one-command run)
+- Python 3.11+ (for API service)
+- Supabase project
+- Stripe account
+- Resend account
 
-## Quick start
+## Quick Start
 
-### 0. Clone the repo
-
-Clone this repo (or use your GitHub/Gitea "Use template") before the steps below.
-
-### 1. Copy env and fill Supabase (required for auth)
-
-```bash
-cp .env.example .env
-# Edit .env: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY from your Supabase project (Connect > Next.js)
-```
-
-### 2. Run with Docker (easiest — both frontend and backend)
-
-Ensure `.env` is set from step 1, then:
-
-```bash
-docker-compose up --build
-```
-
-- Frontend: http://localhost:3000 (or next available port)  
-- API: http://localhost:8000  
-- Health: http://localhost:8000/health  
-
-You can use placeholder Supabase values to run; auth will fail until you set a real project.
-
-### 3. Run locally (dev)
-
-**Terminal 1 — web**
+### 1. Install dependencies
 
 ```bash
 cd apps/web
 npm install
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Fill in the required values:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (for admin operations) |
+| `STRIPE_SECRET_KEY` | Yes | Stripe secret key |
+| `STRIPE_WEBHOOK_SECRET` | Yes | Stripe webhook signing secret |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Stripe publishable key |
+| `RESEND_API_KEY` | Yes | Resend API key for email |
+| `EMAIL_FROM` | No | Sender email (defaults to Resend onboarding) |
+| `ADMIN_EMAIL` | No | Admin notification email |
+| `NEXT_PUBLIC_SITE_URL` | No | Public URL (defaults to localhost:3000) |
+
+### 3. Run locally
+
+```bash
+cd apps/web
 npm run dev
 ```
 
-**Terminal 2 — API**
+Visit http://localhost:3000
+
+### 4. Set up Stripe webhook (for local dev)
 
 ```bash
-cd apps/api
-python -m venv .venv
-source .venv/bin/activate   # or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-## Environment variables
+### 5. Create your first admin user
 
-| Variable | Service | Required | Notes |
-|----------|---------|----------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | web | Yes (for auth) | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | web | Yes (for auth) | Supabase anon/publishable key |
-| `NEXT_PUBLIC_API_URL` | web | No | Defaults to `http://localhost:8000` |
-| `CORS_ORIGINS` | api | No | Comma-separated origins. Defaults to `http://localhost:3000,http://localhost:3001` |
-| `OPENAI_API_KEY` / `LLM_API_KEY` | api | Optional | For AI features |
-| `QDRANT_URL` / `QDRANT_API_KEY` | api | Optional | For vector search (see docker-compose commented section) |
+1. Sign up at `/login`
+2. In Supabase SQL Editor, update your profile role:
+   ```sql
+   UPDATE profiles SET role = 'admin' WHERE id = 'your-user-id';
+   ```
 
-## Notes
+## Project Structure
 
-- Protected routes use Next.js `proxy.ts` (`apps/web/src/proxy.ts`) to refresh Supabase auth and guard `/dashboard`.
-- `src/lib/api.ts` includes Zod-validated API response examples with explicit HTTP error handling.
+```
+apps/web/src/
+  app/
+    page.tsx                        # Public landing page
+    login/                          # Authentication
+    dashboard/                      # Admin dashboard
+      page.tsx                      # Overview with stats
+      customers/                    # Customer CRUD
+      orders/                       # Order management with status workflow
+      invoices/                     # Invoice management (create, send, view)
+      payments/                     # Payment history
+    portal/                         # Customer portal
+      page.tsx                      # Customer dashboard
+      invoices/                     # View and pay invoices
+      orders/                       # Track order status
+    api/
+      stripe/checkout/              # Stripe Checkout session creation
+      stripe/webhook/               # Stripe payment webhook
+      notify/invoice-sent/          # Email notification: invoice sent
+      notify/order-status/          # Email notification: order status
+  components/ui/                    # Shared UI components
+  lib/
+    supabase/                       # Supabase client helpers
+    email/send.ts                   # Email sending utilities
+    types.ts                        # TypeScript types and helpers
+  proxy.ts                          # Auth + role-based route protection (Next.js 16 proxy)
+```
+
+## Database Schema
+
+- **profiles** - User roles (admin/customer), extends Supabase Auth
+- **customers** - Customer records managed by admins
+- **orders** - Delivery orders with status tracking
+- **invoices** - Customer invoices with line items
+- **invoice_items** - Individual line items per invoice
+- **invoice_payments** - Payment records
+
+## Order Status Workflow
+
+```
+Processing -> Ready for Pickup -> Out for Delivery -> Completed
+```
 
 ## Deploy
 
-- **Vercel**: Connect repo, set root to `apps/web`, add env vars from `.env.example`.
-- **Railway**: Add two services (or one); build from `apps/api` and optionally `apps/web`; set env from `.env.example`.
-- **Docker**: Build `apps/web` and `apps/api` images and run on any VM; use the same env vars.
-
-## Repo structure
-
-```
-apps/web     — Next.js (TypeScript, Tailwind, Zod, Supabase auth)
-apps/api     — FastAPI (app/, health, example route, optional AI stubs)
-packages/    — Shared code (config, ui, utils) — optional helpers included
-docs/        — PHILOSOPHY.md and standards
-```
-
-## Starting a new project from this template
-
-1. Clone this repo (or use your Gitea/GitHub “use template”).
-2. `rm -rf .git && git init` and push to your new repo.
-3. Update app name, env, and features. Keep the architecture.
+- **Docker**: `docker-compose up --build`
+- **Vercel**: Connect repo, set root to `apps/web`, add env vars
+- **Railway**: Add web service from `apps/web`, add env vars
