@@ -46,8 +46,17 @@ export default function PortalLayout({
       <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
-            <Link href="/" className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-              A.M.T <span className="text-blue-600">Imports</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              <svg width="28" height="28" viewBox="0 0 72 72" fill="none">
+                <path d="M36 4L68 36L36 68L4 36Z" stroke="#162B52" strokeWidth="2.2" fill="none" />
+                <rect x="19" y="22" width="8" height="28" fill="#162B52" />
+                <rect x="32" y="18" width="8" height="36" fill="#162B52" />
+                <rect x="45" y="22" width="8" height="28" fill="#162B52" />
+                <line x1="19" y1="50" x2="53" y2="50" stroke="#162B52" strokeWidth="2" />
+              </svg>
+              <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+                AMT <span className="text-blue-600">Imports</span>
+              </span>
             </Link>
             <div className="flex items-center gap-1">
               {navItems.map((item) => {

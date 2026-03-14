@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mqRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     // Marquee setup
@@ -38,6 +39,14 @@ export default function Home() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
 
+    return () => window.removeEventListener("scroll", handleScroll);
+  });
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+  }, [menuOpen]);
+
+  useEffect(() => {
     // Intersection Observer reveals
     const io = new IntersectionObserver(
       (entries) => {
@@ -78,10 +87,10 @@ export default function Home() {
       geo.setAttribute("position", new THREE.BufferAttribute(buf, 3));
 
       const mat = new THREE.PointsMaterial({
-        color: 0xc8983a,
+        color: 0x00c2d4,
         size: 0.24,
         transparent: true,
-        opacity: 0.45,
+        opacity: 0.35,
       });
       const pts = new THREE.Points(geo, mat);
       scene.add(pts);
@@ -113,7 +122,6 @@ export default function Home() {
     const cleanup = initThree();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       io.disconnect();
       cleanup.then((fn) => fn?.());
     };
@@ -128,13 +136,16 @@ export default function Home() {
           box-sizing: border-box;
         }
         :root {
-          --g: #c8983a;
-          --gb: #e4b050;
-          --gd: #9a7828;
-          --bk: #0a0a0a;
-          --cr: #f0ebe0;
-          --d1: #111111;
-          --d2: #0d0d0d;
+          --g: #1A6FD4;
+          --gb: #1580EE;
+          --gd: #145DB3;
+          --cyan: #00C2D4;
+          --navy: #162B52;
+          --frost: #B8CDD8;
+          --bk: #ffffff;
+          --cr: #162B52;
+          --d1: #f5f8fa;
+          --d2: #edf2f6;
         }
         html {
           scroll-behavior: smooth;
@@ -148,7 +159,7 @@ export default function Home() {
         }
         ::selection {
           background: var(--g);
-          color: var(--bk);
+          color: #ffffff;
         }
         a {
           color: inherit;
@@ -173,24 +184,25 @@ export default function Home() {
           transition: all 0.35s;
         }
         #nav.solid {
-          background: rgba(10, 10, 10, 0.96);
+          background: rgba(255, 255, 255, 0.96);
           backdrop-filter: blur(16px);
-          border-bottom: 1px solid rgba(200, 152, 58, 0.18);
+          border-bottom: 1px solid rgba(22, 43, 82, 0.1);
+          box-shadow: 0 1px 8px rgba(22, 43, 82, 0.06);
         }
         .nav-links {
           display: flex;
           gap: 28px;
           align-items: center;
         }
-        .nav-links a {
+        .nav-links a:not(.btn-p) {
           font-size: 13px;
           font-weight: 500;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: rgba(240, 235, 224, 0.6);
+          color: rgba(22, 43, 82, 0.55);
           transition: color 0.2s;
         }
-        .nav-links a:hover {
+        .nav-links a:not(.btn-p):hover {
           color: var(--g);
         }
         .wordmark {
@@ -212,11 +224,92 @@ export default function Home() {
           margin-top: -2px;
           text-transform: uppercase;
         }
+        .nav-toggle {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          width: 44px;
+          height: 44px;
+          padding: 0;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          color: var(--navy);
+        }
+        .nav-toggle-icon {
+          position: relative;
+          width: 22px;
+          height: 16px;
+        }
+        .nav-toggle-icon span {
+          display: block;
+          position: absolute;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: currentColor;
+          border-radius: 1px;
+          transition: transform 0.25s ease, opacity 0.2s ease;
+        }
+        .nav-toggle-icon span:nth-child(1) { top: 0; }
+        .nav-toggle-icon span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+        .nav-toggle-icon span:nth-child(3) { bottom: 0; }
+        .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) {
+          top: 50%;
+          transform: translateY(-50%) rotate(45deg);
+        }
+        .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(2) {
+          opacity: 0;
+        }
+        .nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) {
+          bottom: 50%;
+          transform: translateY(50%) rotate(-45deg);
+        }
+        .nav-mobile {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 199;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(12px);
+          padding: 88px 24px 32px;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .nav-mobile.open {
+          opacity: 1;
+          visibility: visible;
+        }
+        .nav-mobile a {
+          font-size: 18px;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--navy);
+          padding: 14px 20px;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .nav-mobile a:hover {
+          color: var(--g);
+        }
+        .nav-mobile .btn-p {
+          margin-top: 16px;
+          padding: 14px 32px;
+        }
 
         /* BUTTONS */
         .btn-p {
           background: var(--g);
-          color: var(--bk);
+          color: #ffffff;
           border: none;
           padding: 14px 36px;
           font-family: "Barlow Condensed", sans-serif;
@@ -234,7 +327,7 @@ export default function Home() {
         .btn-g {
           background: transparent;
           color: var(--cr);
-          border: 1px solid rgba(240, 235, 224, 0.3);
+          border: 1px solid rgba(22, 43, 82, 0.25);
           padding: 14px 36px;
           font-family: "Barlow Condensed", sans-serif;
           font-size: 13px;
@@ -246,7 +339,7 @@ export default function Home() {
         }
         .btn-g:hover {
           border-color: var(--g);
-          background: rgba(200, 152, 58, 0.07);
+          background: rgba(26, 111, 212, 0.06);
         }
         .btn-p.sm {
           padding: 10px 24px;
@@ -259,6 +352,7 @@ export default function Home() {
           min-height: 640px;
           display: flex;
           align-items: center;
+          justify-content: space-between;
           overflow: hidden;
           background: var(--bk);
         }
@@ -284,7 +378,7 @@ export default function Home() {
           right: 7%;
           width: 1.5px;
           height: 180px;
-          background: linear-gradient(transparent, var(--g), transparent);
+          background: linear-gradient(transparent, var(--cyan), transparent);
           transform: rotate(12deg);
           opacity: 0.55;
         }
@@ -294,7 +388,7 @@ export default function Home() {
           right: 20%;
           width: 1px;
           height: 110px;
-          background: linear-gradient(transparent, var(--g), transparent);
+          background: linear-gradient(transparent, var(--cyan), transparent);
           transform: rotate(-9deg);
           opacity: 0.3;
         }
@@ -336,7 +430,7 @@ export default function Home() {
           font-size: 20px;
           font-weight: 300;
           line-height: 1.8;
-          color: rgba(240, 235, 224, 0.55);
+          color: rgba(22, 43, 82, 0.55);
           max-width: 480px;
           margin-top: 30px;
           margin-bottom: 44px;
@@ -354,8 +448,140 @@ export default function Home() {
         .scroll-line div {
           width: 1px;
           height: 56px;
-          background: linear-gradient(transparent, var(--g));
+          background: linear-gradient(transparent, var(--cyan));
           opacity: 0.45;
+        }
+
+        /* HERO SHOWCASE */
+        .hero-showcase {
+          position: absolute;
+          right: -8%;
+          top: 22%;
+          width: 55vw;
+          max-width: 1620px;
+          z-index: 2;
+          perspective: 1200px;
+          animation: heroFloat 6s ease-in-out infinite;
+        }
+        @keyframes heroFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .hero-showcase-slide {
+          position: absolute;
+          width: 100%;
+          opacity: 0;
+          transform: translateY(40px);
+          animation: heroSlideCycle 20s ease-in-out infinite;
+        }
+        .hero-showcase-slide:nth-child(1) { animation-delay: 0s; }
+        .hero-showcase-slide:nth-child(2) { animation-delay: 5s; }
+        .hero-showcase-slide:nth-child(3) { animation-delay: 10s; }
+        .hero-showcase-slide:nth-child(4) { animation-delay: 15s; }
+        .hero-showcase-card {
+          width: 100%;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow:
+            0 40px 80px rgba(22, 43, 82, 0.18),
+            0 12px 32px rgba(22, 43, 82, 0.1),
+            0 0 0 1px rgba(184, 205, 216, 0.35);
+          transform: rotateY(-2deg) rotateX(1deg);
+        }
+        .hero-showcase-card img {
+          width: 100%;
+          height: auto;
+          display: block;
+        }
+        .hero-showcase-caption {
+          text-align: center;
+          margin-top: 28px;
+          font-size: 26px;
+          font-weight: 700;
+          color: var(--navy);
+          letter-spacing: -0.01em;
+          line-height: 1.3;
+          opacity: 0;
+          transform: translateY(10px);
+          animation: heroCaptionIn 20s ease-in-out infinite;
+        }
+        .hero-showcase-slide:nth-child(1) .hero-showcase-caption { animation-delay: 0s; }
+        .hero-showcase-slide:nth-child(2) .hero-showcase-caption { animation-delay: 5s; }
+        .hero-showcase-slide:nth-child(3) .hero-showcase-caption { animation-delay: 10s; }
+        .hero-showcase-slide:nth-child(4) .hero-showcase-caption { animation-delay: 15s; }
+        @keyframes heroSlideCycle {
+          0% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.96);
+          }
+          4% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          22% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          27% {
+            opacity: 0;
+            transform: translateY(-24px) scale(1.01);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(40px) scale(0.96);
+          }
+        }
+        @keyframes heroCaptionIn {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          6% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          22% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+          27% {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+        }
+        .hero-showcase-glow {
+          position: absolute;
+          bottom: -25%;
+          left: 5%;
+          width: 90%;
+          height: 70%;
+          background: radial-gradient(ellipse, rgba(0, 194, 212, 0.1) 0%, rgba(26, 111, 212, 0.04) 40%, transparent 70%);
+          pointer-events: none;
+        }
+        @media (max-width: 1440px) {
+          .hero-showcase {
+            width: 50vw;
+            right: -6%;
+          }
+        }
+        @media (max-width: 1280px) {
+          .hero-showcase {
+            width: 48vw;
+            right: -5%;
+          }
+          .hero-showcase-caption {
+            font-size: 17px;
+            margin-top: 16px;
+          }
+        }
+        @media (max-width: 1024px) {
+          .hero-showcase {
+            display: none;
+          }
         }
 
         /* MARQUEE */
@@ -386,13 +612,13 @@ export default function Home() {
           font-weight: 700;
           letter-spacing: 0.26em;
           text-transform: uppercase;
-          color: var(--bk);
+          color: #ffffff;
           white-space: nowrap;
         }
         .mq-dot {
           width: 4px;
           height: 4px;
-          background: var(--bk);
+          background: #ffffff;
           border-radius: 50%;
         }
 
@@ -443,7 +669,7 @@ export default function Home() {
           font-weight: 300;
           font-size: 17px;
           line-height: 1.8;
-          color: rgba(240, 235, 224, 0.55);
+          color: rgba(22, 43, 82, 0.55);
         }
 
         /* ABOUT */
@@ -464,7 +690,7 @@ export default function Home() {
         .stat-box {
           background: var(--d1);
           padding: 36px 28px;
-          border: 1px solid #1c1c1c;
+          border: 1px solid var(--frost);
         }
         .stat-num {
           font-family: "Bebas Neue", sans-serif;
@@ -477,7 +703,7 @@ export default function Home() {
           font-weight: 600;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(240, 235, 224, 0.3);
+          color: rgba(22, 43, 82, 0.4);
           margin-top: 8px;
         }
 
@@ -503,7 +729,7 @@ export default function Home() {
           left: -4px;
           font-family: "Bebas Neue", sans-serif;
           font-size: 88px;
-          color: rgba(200, 152, 58, 0.08);
+          color: rgba(26, 111, 212, 0.07);
           line-height: 1;
           pointer-events: none;
           user-select: none;
@@ -527,7 +753,7 @@ export default function Home() {
           font-size: 12px;
           letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: rgba(240, 235, 224, 0.28);
+          color: rgba(22, 43, 82, 0.4);
           margin-bottom: 18px;
         }
 
@@ -544,7 +770,7 @@ export default function Home() {
         .price-card {
           background: var(--d1);
           padding: 40px 32px;
-          border: 1px solid #1c1c1c;
+          border: 1px solid var(--frost);
           transition: border-color 0.3s, transform 0.3s;
         }
         .price-card:hover {
@@ -576,13 +802,13 @@ export default function Home() {
           font-weight: 500;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(240, 235, 224, 0.28);
+          color: rgba(22, 43, 82, 0.4);
           margin-top: 6px;
         }
         .price-info {
           padding: 22px 28px;
-          background: rgba(200, 152, 58, 0.06);
-          border: 1px solid rgba(200, 152, 58, 0.2);
+          background: rgba(26, 111, 212, 0.04);
+          border: 1px solid rgba(26, 111, 212, 0.15);
           display: flex;
           gap: 16px;
           align-items: center;
@@ -604,9 +830,9 @@ export default function Home() {
           gap: 3px;
         }
         .svc-card {
-          background: var(--d1);
+          background: #ffffff;
           padding: 36px 24px;
-          border: 1px solid #1c1c1c;
+          border: 1px solid var(--frost);
           transition: border-color 0.3s, transform 0.3s;
         }
         .svc-card:hover {
@@ -640,7 +866,7 @@ export default function Home() {
           transform: translate(-50%, -50%);
           font-family: "Bebas Neue", sans-serif;
           font-size: clamp(180px, 28vw, 340px);
-          color: rgba(200, 152, 58, 0.032);
+          color: rgba(26, 111, 212, 0.04);
           letter-spacing: 0.08em;
           pointer-events: none;
           white-space: nowrap;
@@ -703,7 +929,7 @@ export default function Home() {
         .hour-row {
           background: var(--d1);
           padding: 18px 22px;
-          border: 1px solid #1c1c1c;
+          border: 1px solid var(--frost);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -721,16 +947,16 @@ export default function Home() {
           letter-spacing: 0.06em;
         }
         .hour-row.closed .hour-day {
-          color: rgba(240, 235, 224, 0.2);
+          color: rgba(22, 43, 82, 0.25);
         }
         .hour-row.closed .hour-time {
-          color: rgba(240, 235, 224, 0.22);
+          color: rgba(22, 43, 82, 0.28);
         }
 
         /* FOOTER */
         footer {
-          background: #060606;
-          border-top: 1px solid #181818;
+          background: var(--d2);
+          border-top: 1px solid var(--frost);
           padding: 36px 60px;
           display: flex;
           align-items: center;
@@ -749,13 +975,13 @@ export default function Home() {
           font-weight: 400;
           letter-spacing: 0.22em;
           text-transform: uppercase;
-          color: rgba(240, 235, 224, 0.18);
+          color: rgba(22, 43, 82, 0.35);
         }
         .footer-credit {
           font-size: 11px;
           font-weight: 400;
           letter-spacing: 0.12em;
-          color: rgba(240, 235, 224, 0.28);
+          color: rgba(22, 43, 82, 0.45);
         }
         .footer-credit a {
           color: var(--g);
@@ -806,16 +1032,54 @@ export default function Home() {
         }
         @media (max-width: 768px) {
           #nav {
-            padding: 0 24px;
+            padding: 0 20px;
           }
-          .nav-links a {
+          .nav-links {
+            display: none;
+          }
+          .nav-toggle {
+            display: flex;
+          }
+          .nav-mobile {
+            display: flex;
+          }
+          .nav-mobile.open {
+            display: flex;
+          }
+          #hero {
+            height: auto;
+            min-height: 0;
+            align-items: flex-start;
+            padding: 120px 20px 72px;
+          }
+          .hero-content {
+            padding: 0;
+            max-width: 100%;
+          }
+          .hero-h1 {
+            font-size: 64px;
+            line-height: 0.9;
+          }
+          .hero-sub {
+            font-size: 17px;
+            max-width: 100%;
+            margin-top: 20px;
+            margin-bottom: 32px;
+          }
+          .hero-ctas {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .scroll-line {
             display: none;
           }
           .sec {
-            padding: 80px 24px;
+            padding: 72px 20px;
           }
-          .hero-content {
-            padding: 0 24px;
+          .about-grid,
+          .contact-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
           }
           .steps-grid,
           .price-grid {
@@ -851,19 +1115,19 @@ export default function Home() {
           >
             <path
               d="M36 4L68 36L36 68L4 36Z"
-              stroke="#C8983A"
+              stroke="#162B52"
               strokeWidth="2.2"
               fill="none"
             />
-            <rect x="19" y="22" width="8" height="28" fill="#C8983A" />
-            <rect x="32" y="18" width="8" height="36" fill="#C8983A" />
-            <rect x="45" y="22" width="8" height="28" fill="#C8983A" />
+            <rect x="19" y="22" width="8" height="28" fill="#162B52" />
+            <rect x="32" y="18" width="8" height="36" fill="#162B52" />
+            <rect x="45" y="22" width="8" height="28" fill="#162B52" />
             <line
               x1="19"
               y1="50"
               x2="53"
               y2="50"
-              stroke="#C8983A"
+              stroke="#162B52"
               strokeWidth="2"
             />
           </svg>
@@ -881,7 +1145,32 @@ export default function Home() {
             Client Login
           </Link>
         </div>
+        <button
+          type="button"
+          className="nav-toggle"
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <span className="nav-toggle-icon" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
       </nav>
+      <div
+        className={`nav-mobile ${menuOpen ? "open" : ""}`}
+        aria-hidden={!menuOpen}
+      >
+        <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
+        <a href="#pricing" onClick={() => setMenuOpen(false)}>Pricing</a>
+        <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+        <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+        <Link href="/login" className="btn-p" onClick={() => setMenuOpen(false)}>
+          Client Login
+        </Link>
+      </div>
 
       {/* HERO */}
       <section id="hero">
@@ -908,9 +1197,44 @@ export default function Home() {
             <Link href="/login" className="btn-p">
               Client Login
             </Link>
-            <a href="#services" className="btn-g">
-              Our Services
-            </a>
+            <Link href="/client-portal" className="btn-g">
+              See the Client Portal
+            </Link>
+          </div>
+        </div>
+        <div className="hero-showcase">
+          <div className="hero-showcase-glow"></div>
+          <div className="hero-showcase-slide">
+            <div className="hero-showcase-card">
+              <img src="/portal-dashboard.png" alt="Client Dashboard" />
+            </div>
+            <p className="hero-showcase-caption">
+              Your dashboard. Your packages. All&nbsp;in&nbsp;one&nbsp;place.
+            </p>
+          </div>
+          <div className="hero-showcase-slide">
+            <div className="hero-showcase-card">
+              <img src="/portal-orders.png" alt="My Orders" />
+            </div>
+            <p className="hero-showcase-caption">
+              View your orders on the go — anytime, anywhere.
+            </p>
+          </div>
+          <div className="hero-showcase-slide">
+            <div className="hero-showcase-card">
+              <img src="/portal-invoice-detail.png" alt="Invoice Details" />
+            </div>
+            <p className="hero-showcase-caption">
+              See what&rsquo;s owed. Pay online. No&nbsp;hassle.
+            </p>
+          </div>
+          <div className="hero-showcase-slide">
+            <div className="hero-showcase-card">
+              <img src="/portal-order-detail.png" alt="Order Tracking" />
+            </div>
+            <p className="hero-showcase-caption">
+              Track every package. Schedule delivery. Sign&nbsp;up&nbsp;today!
+            </p>
           </div>
         </div>
         <div className="scroll-line">
@@ -1296,19 +1620,19 @@ export default function Home() {
           >
             <path
               d="M36 4L68 36L36 68L4 36Z"
-              stroke="#C8983A"
+              stroke="#162B52"
               strokeWidth="2.2"
               fill="none"
             />
-            <rect x="19" y="22" width="8" height="28" fill="#C8983A" />
-            <rect x="32" y="18" width="8" height="36" fill="#C8983A" />
-            <rect x="45" y="22" width="8" height="28" fill="#C8983A" />
+            <rect x="19" y="22" width="8" height="28" fill="#162B52" />
+            <rect x="32" y="18" width="8" height="36" fill="#162B52" />
+            <rect x="45" y="22" width="8" height="28" fill="#162B52" />
             <line
               x1="19"
               y1="50"
               x2="53"
               y2="50"
-              stroke="#C8983A"
+              stroke="#162B52"
               strokeWidth="2"
             />
           </svg>

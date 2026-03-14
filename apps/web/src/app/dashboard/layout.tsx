@@ -63,8 +63,17 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="hidden lg:flex lg:w-64 flex-col border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
         <div className="h-16 flex items-center px-6 border-b border-zinc-200 dark:border-zinc-800">
-          <Link href="/" className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-            A.M.T <span className="text-blue-600">Imports</span>
+          <Link href="/" className="flex items-center gap-2.5">
+            <svg width="28" height="28" viewBox="0 0 72 72" fill="none">
+              <path d="M36 4L68 36L36 68L4 36Z" stroke="#162B52" strokeWidth="2.2" fill="none" />
+              <rect x="19" y="22" width="8" height="28" fill="#162B52" />
+              <rect x="32" y="18" width="8" height="36" fill="#162B52" />
+              <rect x="45" y="22" width="8" height="28" fill="#162B52" />
+              <line x1="19" y1="50" x2="53" y2="50" stroke="#162B52" strokeWidth="2" />
+            </svg>
+            <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+              AMT <span className="text-blue-600">Imports</span>
+            </span>
           </Link>
           <span className="ml-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
             Admin
@@ -110,8 +119,17 @@ export default function DashboardLayout({
       {/* Mobile header */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="lg:hidden h-14 flex items-center justify-between px-4 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-          <Link href="/" className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
-            A.M.T <span className="text-blue-600">Imports</span>
+          <Link href="/" className="flex items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 72 72" fill="none">
+              <path d="M36 4L68 36L36 68L4 36Z" stroke="#162B52" strokeWidth="2.2" fill="none" />
+              <rect x="19" y="22" width="8" height="28" fill="#162B52" />
+              <rect x="32" y="18" width="8" height="36" fill="#162B52" />
+              <rect x="45" y="22" width="8" height="28" fill="#162B52" />
+              <line x1="19" y1="50" x2="53" y2="50" stroke="#162B52" strokeWidth="2" />
+            </svg>
+            <span className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">
+              AMT <span className="text-blue-600">Imports</span>
+            </span>
           </Link>
           <nav className="flex items-center gap-1">
             {navItems.map((item) => {
